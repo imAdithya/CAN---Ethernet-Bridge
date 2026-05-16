@@ -1,0 +1,15 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# RTL sources
+*.v    linguist-language=Verilog
+*.sv   linguist-language=SystemVerilog
+
+# Documentation
+*.md   linguist-documentation=false
+*.xlsx binary
+
+# Images
+*.png  binary
+*.jpg  binary
+*.jpeg binary

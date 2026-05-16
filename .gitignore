@@ -1,0 +1,35 @@
+# Simulation artifacts
+work/
+transcript
+*.wlf
+*.ucdb
+*.log
+*.vcd
+*.lck
+*.bak
+
+# Coverage reports (regenerable)
+covhtmlreport/
+coverage_report.txt
+coverage_detail.txt
+merged_coverage.ucdb
+
+# QuestaSim compiled
+vsim.wlf
+modelsim.ini
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Temporary
+~$*
+*.tmp

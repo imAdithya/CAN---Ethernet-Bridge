@@ -1,0 +1,8 @@
+Educational use — IIITDM Chennai.
+
+This project is developed as part of the Final Year Project at
+Indian Institute of Information Technology, Design and Manufacturing (IIITDM), Chennai.
+
+Third-party IP cores used under their respective licences:
+- Ethernet MAC core: LGPL (OpenCores, Mohor)
+- CAN controller: LGPL (OpenCores, Mohor)
