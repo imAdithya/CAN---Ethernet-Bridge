@@ -1,7 +1,7 @@
 # CAN–Ethernet Bridge IP Core
 
 Bidirectional CAN-to-Ethernet bridge IP core with dual-bus Wishbone interface.
-Designed and verified at **IIITDM Chennai** as part of the Final Year Project.
+Designed and verified at **IIITDM Kancheepuram** as part of the Final Year Project.
 
 ## Bridge Overview
 
@@ -141,5 +141,5 @@ The bridge uses a custom Ethernet payload format:
 
 ## Licence
 
-Educational use — IIITDM Chennai.
+Educational use — IIITDM Kancheepuram.
 Ethernet MAC core: LGPL (OpenCores). CAN controller: LGPL (OpenCores).
