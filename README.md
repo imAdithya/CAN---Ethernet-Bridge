@@ -113,6 +113,7 @@ See [INSTALL.md](INSTALL.md) for tool requirements.
 ├── .gitattributes
 ├── README.md
 ├── INSTALL.md
+├── ethmac.core
 └── LICENSE
 ```
 
