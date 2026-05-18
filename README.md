@@ -35,7 +35,7 @@ Designed and verified at **IIITDM Kancheepuram** as part of the Final Year Proje
 
 ```bash
 # 1. Compile (QuestaSim)
-cd verif/tb
+cd verif/bridge/tb
 make comp
 
 # 2. Run a single test
@@ -54,36 +54,61 @@ See [INSTALL.md](INSTALL.md) for tool requirements.
 
 ```
 .
-├── rtl/                          RTL source files
-│   ├── can_eth_bridge_top.v        Top-level bridge module
-│   ├── bridge_upstream.v           Upstream FSM (CAN → ETH)
-│   ├── bridge_downstream.v        Downstream FSM (ETH → CAN)
-│   ├── bridge_regs.v              Host-accessible register file
-│   ├── can_id_filter.v            16-entry CAN ID filter
-│   ├── can_tx_queue.v             8-deep CAN TX FIFO
-│   ├── wb_arbiter.v               Dual-bus Wishbone arbiter
-│   ├── wb_adapter_32to8.v         32-to-8 bit bus width adapter
-│   └── can_eth_bridge_defines.v   Global constants and FSM states
+├── rtl/
+│   ├── bridge/                      Bridge IP RTL (9 modules)
+│   │   ├── can_eth_bridge_top.v       Top-level bridge module
+│   │   ├── bridge_upstream.v          Upstream FSM (CAN → ETH)
+│   │   ├── bridge_downstream.v        Downstream FSM (ETH → CAN)
+│   │   ├── bridge_regs.v             Host-accessible register file
+│   │   ├── can_id_filter.v           16-entry CAN ID filter
+│   │   ├── can_tx_queue.v            8-deep CAN TX FIFO
+│   │   ├── wb_arbiter.v              Dual-bus Wishbone arbiter
+│   │   ├── wb_adapter_32to8.v        32-to-8 bit bus width adapter
+│   │   └── can_eth_bridge_defines.v  Global constants and FSM states
+│   │
+│   ├── ethmac/                      Ethernet MAC RTL (OpenCores, 27 files)
+│   │   ├── eth_top.v                  MAC top-level
+│   │   ├── eth_wishbone.v             Wishbone interface + DMA
+│   │   ├── eth_rxethmac.v             RX datapath
+│   │   ├── eth_txethmac.v             TX datapath
+│   │   ├── eth_miim.v                 MII management
+│   │   ├── eth_registers.v            MAC register file
+│   │   └── ...                        (21 more supporting modules)
+│   │
+│   └── can/                         CAN controller RTL (OpenCores, 13 files)
+│       ├── can_top.v                  CAN top-level (SJA1000)
+│       ├── can_bsp.v                  Bit stream processor
+│       ├── can_btl.v                  Bit timing logic
+│       ├── can_registers.v            CAN register file
+│       └── ...                        (9 more supporting modules)
 │
 ├── verif/
-│   ├── tb/                       UVM testbench sources
-│   │   ├── tb_bridge_top.sv        Testbench top module
-│   │   ├── bridge_pkg.sv          UVM package (agents, env, tests)
-│   │   ├── bridge_*_seq.sv        Test sequences
-│   │   ├── *_test.sv              25 test cases
-│   │   ├── upstream_wave.do       QuestaSim upstream waveform script
-│   │   ├── downstream_wave.do     QuestaSim downstream waveform script
-│   │   └── Makefile               Build and regression targets
-│   └── scripts/
-│       └── Makefile.questa        Standalone QuestaSim Makefile
+│   ├── bridge/tb/                   Bridge UVM testbench (50 files)
+│   │   ├── tb_bridge_top.sv           Testbench top module
+│   │   ├── bridge_pkg.sv             UVM package (agents, env, tests)
+│   │   ├── bridge_*_seq.sv           Test sequences
+│   │   ├── *_test.sv                 25 test cases
+│   │   ├── upstream_wave.do          QuestaSim waveform script
+│   │   └── Makefile                  Build and regression targets
+│   │
+│   └── ethmac/tb/                   Ethernet MAC UVM testbench (101 files)
+│       ├── tb_top.sv                  MAC testbench top module
+│       ├── ethmac_pkg.sv             UVM package
+│       ├── *_test.sv                 MAC test cases
+│       ├── coverage.sv               MAC functional coverage
+│       └── Makefile                  MAC build and regression targets
 │
 ├── docs/
-│   ├── CAN_ETH_Bridge_Spec.md      Functional specification
-│   ├── CAN_ETH_Bridge_Design.md    Micro-architecture design document
+│   ├── CAN_ETH_Bridge_Spec.md        Functional specification
+│   ├── CAN_ETH_Bridge_Design.md      Micro-architecture design document
 │   ├── CAN_ETH_Bridge_TestPlan.xlsx  Full 25-test verification plan
-│   └── figures/                      Architecture and waveform diagrams
+│   └── ethmac/                      Ethernet MAC documentation (OpenCores)
+│       ├── eth_speci.pdf              MAC functional specification
+│       ├── eth_design_document.pdf    MAC design document
+│       ├── ethernet_datasheet_OC_head.pdf
+│       └── ethernet_product_brief_OC_head.pdf
 │
-├── scripts/                      Utility scripts (future)
+├── scripts/                         Utility scripts (future)
 │
 ├── .gitignore
 ├── .gitattributes
