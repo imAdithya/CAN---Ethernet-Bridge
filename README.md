@@ -1,9 +1,5 @@
-# CAN–Ethernet Bridge IP Core
-
 Bidirectional CAN-to-Ethernet bridge IP core with dual-bus Wishbone interface.
 Designed and verified at **IIITDM Kancheepuram** as part of the Final Year Project.
-
-## Bridge Overview
 
 ```
                     ┌─────────────────────────────────────────┐
@@ -21,8 +17,6 @@ Designed and verified at **IIITDM Kancheepuram** as part of the Final Year Proje
                     └─────────────────────────────────────────┘
 ```
 
-### Key Features
-
 - **Gateway mode** — CAN frames encapsulated with custom EtherType `0xCAFE`
 - **Tunnel mode** — adds sequence number + timestamp (EtherType `0xCABE`)
 - **16-entry CAN ID filter** — accept-list or reject-list mode
@@ -32,7 +26,6 @@ Designed and verified at **IIITDM Kancheepuram** as part of the Final Year Proje
 - **6 hardware counters** — CAN RX, ETH TX, ETH RX, CAN TX, filtered, errors
 
 ## Quick Start
-
 ```bash
 # 1. Compile (QuestaSim)
 cd verif/bridge/tb
@@ -51,7 +44,6 @@ make regress_report
 See [INSTALL.md](INSTALL.md) for tool requirements.
 
 ## Repository Structure
-
 ```
 .
 ├── rtl/
@@ -91,6 +83,14 @@ See [INSTALL.md](INSTALL.md) for tool requirements.
 │   │   ├── upstream_wave.do          QuestaSim waveform script
 │   │   └── Makefile                  Build and regression targets
 │   │
+│   ├── can/tb/                      CAN controller UVM testbench
+│   │   ├── top.sv                     Testbench top module
+│   │   ├── cb_agent/                  CAN bus agent
+│   │   ├── wb_agent/                  Wishbone agent & coverage
+│   │   ├── seqs/                      UVM sequences
+│   │   ├── tests/                     UVM tests (47 test cases)
+│   │   └── run_complete_coverage.do   Regression script for 100% coverage
+│   │
 │   └── ethmac/tb/                   Ethernet MAC UVM testbench (101 files)
 │       ├── tb_top.sv                  MAC testbench top module
 │       ├── ethmac_pkg.sv             UVM package
@@ -117,9 +117,52 @@ See [INSTALL.md](INSTALL.md) for tool requirements.
 └── LICENSE
 ```
 
-## Tests
+## CAN Verification Coverage
 
-The verification suite contains **25 UVM tests** across 8 categories:
+The CAN verification suite uses UVM and includes 47 tests with detailed functional covergroups for 100% coverage closure.
+
+| # | Covergroup | Maps to Test | What It Proves |
+|---|---|---|---|
+| **File: wb_can_coverage.sv (9 Covergroups)** | | | |
+| 1 | `wb_can_cg` | WB-01 Single Access | Address ranges + R/W + data patterns |
+| 2 | `wb_can_timing_cg` | WB-02 Consecutive | Back-to-back transaction timing |
+| 3 | `wb_reg_access_cg` | REG-01 Reg Access | All 32 addresses × R/W (64 cross bins) |
+| 4 | `wb_reg_reset_cg` | REG-02 Reg Reset | Key registers match datasheet defaults after reset |
+| 5 | `wb_reg_ro_cg` | REG-03 Reg RO | Write attempts to all read-only register locations |
+| 6 | `wb_reset_mode_lock_cg` | REG-04 ResetModeLock | Config reg writes in operating vs. reset mode |
+| 7 | `wb_mode_switch_cg` | REG-05 Mode Switch | BasicCAN ↔ PeliCAN CDR.7 transitions |
+| 8 | `wb_clk_div_cg` | REG-06 Clk Div | All 8 CDR[2:0] divider scaling bins |
+| 9 | `wb_reset_recovery_cg` | WB-03 ResetStress | Post-reset bus recovery transactions |
+| **File: can_tx_coverage.sv (9 Covergroups)** | | | |
+| 10 | `can_tx_frame_format_cg`| TX-01, TX-02 | SFF vs. EFF frame format coverage |
+| 11 | `can_tx_dlc_cg` | TX-04, TX-09 | All DLC values 0–8 covered |
+| 12 | `can_tx_rtr_cg` | TX-03 | RTR bit set vs. cleared in transmitted frames |
+| 13 | `can_tx_id_range_cg` | TX-01, TX-02, TX-09 | ID bins across low, mid, and max identifier ranges |
+| 14 | `can_tx_cmd_cg` | TX-05, TX-05b, TX-07 | All CMR command bits exercised (TR, AT, SRR, SST) |
+| 15 | `can_tx_data_pattern_cg`| TX-08 | Walking-1s, Walking-0s, and random data patterns |
+| 16 | `can_tx_status_cg` | TX-01 to TX-09 | TBS, TCS, and interrupt status flags after TX |
+| 17 | `can_tx_format_x_dlc_cg`| TX-04, TX-09 | Cross: frame format (SFF/EFF) × DLC (0–8) |
+| 18 | `can_tx_format_x_rtr_cg`| TX-03 | Cross: frame format (SFF/EFF) × RTR bit |
+| **File: can_rx_coverage.sv (6 Covergroups)** | | | |
+| 19 | `can_rx_filter_mode_cg` | RX-01, RX-02 | Acceptance filter mode (Single vs Dual) |
+| 20 | `can_rx_overrun_cg` | RX-05 | Data Overrun Status (DOS) bit detection |
+| 21 | `can_rx_rmc_cg` | RX-06 | Receive Message Counter (RMC) depth bins |
+| 22 | `can_rx_release_cg` | RX-07 | Release Receive Buffer (RRB) command |
+| 23 | `can_rx_rtr_cg` | RX-08 | Remote Frame (RTR) vs Data Frame reception |
+| 24 | `can_rx_format_cg` | RX-09 | Cross: RX Format (SFF/EFF) × DLC (0–8) |
+| **File: can_prot_coverage.sv (3 Covergroups)** | | | |
+| 25 | `can_prot_arb_cg` | ARB-01, 02 | SFF/EFF arbitration scenarios |
+| 26 | `can_prot_alc_cg` | ALC-01 | Arbitration Lost Capture (ALC) bit locations |
+| 27 | `can_prot_bit_stuff_cg` | STF-01 | Data patterns triggering bit stuffing |
+| **File: can_err_coverage.sv (3 Covergroups)** | | | |
+| 28 | `can_err_ecc_cg` | ERR Tests | ECC Capture: Bit, Form, Stuff, Other errors |
+| 29 | `can_err_status_cg` | State Tests | Warning and Bus-Off status transitions |
+| 30 | `can_err_counters_cg` | ERR Tests | TX/RX Error Counter ranges (Low, Warn, Pass) |
+
+**Total: 30 Covergroups \| 281 Bins \| 281 Hits \| 100.00% Coverage**
+
+## Tests
+The verification suite contains **25 UVM tests** for the Bridge IP across 8 categories:
 
 | Category | Tests | Coverage Target |
 |----------|-------|-----------------|
@@ -148,7 +191,6 @@ Expected regression output:
 ```
 
 ## Encapsulation Format
-
 The bridge uses a custom Ethernet payload format:
 
 | Word | Bits    | Field |
@@ -163,8 +205,6 @@ The bridge uses a custom Ethernet payload format:
 | 5    | [23:16] | DLC + control bits |
 | 6–8  | —       | CAN payload data (up to 8 bytes, zero-padded) |
 
-
 ## Licence
-
 Educational use — IIITDM Kancheepuram.
 Ethernet MAC core: LGPL (OpenCores). CAN controller: LGPL (OpenCores).
