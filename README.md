@@ -107,8 +107,7 @@ See [INSTALL.md](INSTALL.md) for tool requirements.
 │       ├── eth_design_document.pdf    MAC design document
 │       ├── ethernet_datasheet_OC_head.pdf
 │       └── ethernet_product_brief_OC_head.pdf
-│
-├── scripts/                         Utility scripts (future)
+│       └── ETHMAC_TestPlan.xlsx
 │
 ├── .gitignore
 ├── .gitattributes
